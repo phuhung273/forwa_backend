@@ -1,17 +1,7 @@
 version: "3.9"
 
 services:
-  nginx:
-    image: nginx:alpine
-    ports:
-      - "80:80"
-      - "443:443"
-      - "3000:3000"
-    volumes:
-      - ./docker/nginx/log:/var/log/nginx
-      - ./docker/nginx/:/etc/nginx/conf.d/
-    
-
+  
   es01:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.15.0
     environment:
