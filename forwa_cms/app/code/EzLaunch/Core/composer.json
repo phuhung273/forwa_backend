@@ -1,0 +1,17 @@
+{
+    "name": "ezlaunch/core",
+    "description": "",
+    "type": "magento2-module",
+    "version": "1.0.0",
+    "license": [
+      "MIT"
+    ],
+    "autoload": {
+      "psr-4": {
+        "EzLaunch\\Core\\": ""
+      },
+      "files": [
+        "registration.php"
+      ]
+    }
+  }

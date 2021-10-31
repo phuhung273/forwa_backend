@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © EzLaunch, Inc. All rights reserved.
+ */
+-->
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
+
+    <!-- Order Service -->
+    <route url="/V2/orders" method="GET">
+        <service class="EzLaunch\Sales\Api\OrderRepositoryInterface" method="getCustomList"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+    </route>
+
+    <route url="/V2/order/:orderId/invoice" method="POST">
+        <service class="Magento\Sales\Api\InvoiceOrderInterface" method="execute"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+    </route>
+
+    <route url="/V2/order/:orderId/ship" method="POST">
+        <service class="Magento\Sales\Api\ShipOrderInterface" method="execute"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+    </route>
+</routes>

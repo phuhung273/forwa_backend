@@ -1,0 +1,46 @@
+version: "3.9"
+
+services:
+  forwa_cms:
+    build: ./forwa_cms
+    working_dir: /var/www/forwa_cms
+    volumes:
+      - ./docker/php-fpm/fpm-php.www.log:/var/log/fpm-php.www.log
+    depends_on:
+      - mysql
+    command: > 
+      sh -c "
+        php bin/magento setup:di:compile
+        php -dmemory_limit=1G bin/magento setup:upgrade
+        php bin/magento setup:static-content:deploy -f
+        php bin/magento cache:flush
+      "dock
+
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+      - "3000:3000"
+    volumes:
+      - ./docker/nginx/log:/var/log/nginx
+      - ./docker/nginx/:/etc/nginx/conf.d/
+    depends_on:
+      - forwa_cms
+    
+
+  es01:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.15.0
+    environment:
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+
+
+  mysql:
+    image: mysql:5.7.35
+    environment:
+      MYSQL_DATABASE: forwa
+      MYSQL_ROOT_PASSWORD: 123ezTour
+    volumes:
+      - ./docker/mysql:/var/lib/mysql

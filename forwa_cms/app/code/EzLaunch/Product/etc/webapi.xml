@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © EzLaunch, Inc. All rights reserved.
+ */
+-->
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
+
+    <!-- Product Service -->
+    <route url="/V2/products" method="POST">
+        <service class="Magento\Catalog\Api\ProductRepositoryInterface" method="save"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+    </route>
+    <route url="/V2/products/:sku" method="PUT">
+        <service class="Magento\Catalog\Api\ProductRepositoryInterface" method="save" />
+    </route>
+    <route url="/V2/products/:sku" method="DELETE">
+        <service class="Magento\Catalog\Api\ProductRepositoryInterface" method="deleteById"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+    </route>
+    <route url="/V2/products" method="GET">
+        <service class="Magento\Catalog\Api\ProductRepositoryInterface" method="getList"/>
+    </route>
+    <route url="/V2/products/:sku" method="GET">
+        <service class="Magento\Catalog\Api\ProductRepositoryInterface" method="get"/>
+    </route>
+</routes>

@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © EzLaunch, Inc. All rights reserved.
+ */
+-->
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
+
+    <!-- Managing my Cart Items -->
+    <route url="/V2/carts/mine/items" method="POST">
+        <service class="EzLaunch\Quote\Api\CartItemRepositoryInterface" method="addToCartCreateOrder"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+
+    <route url="/V2/carts/items" method="GET">
+        <service class="EzLaunch\Quote\Api\CartItemRepositoryInterface" method="getListContain"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+    </route>
+</routes>

@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © EzLaunch, Inc. All rights reserved.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    
+    <preference for="EzLaunch\Customer\Api\CustomerTokenServiceInterface" type="EzLaunch\Customer\Model\CustomerTokenService" />
+    <preference for="EzLaunch\Customer\Api\AccountManagementInterface"
+                type="EzLaunch\Customer\Model\AccountManagementApi" />
+    
+    <type name="EzLaunch\Customer\Model\AccountManagement">
+        <arguments>
+            <argument name="sessionManager" xsi:type="object">Magento\Framework\Session\SessionManagerInterface\Proxy</argument>
+        </arguments>
+    </type>
+
+    <preference for="EzLaunch\Customer\Api\Data\LoginResponseInterface" type="EzLaunch\Customer\Model\Data\LoginResponse" />
+
+</config>

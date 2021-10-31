@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © EzLaunch, Inc. All rights reserved.
+ */
+-->
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
+
+    <route url="/V2/register" method="POST">
+        <service class="EzLaunch\Customer\Api\AccountManagementInterface" method="register"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+
+    <route url="/V2/socialLogin" method="POST">
+        <service class="EzLaunch\Customer\Api\AccountManagementInterface" method="socialLogin"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+
+    <route url="/V2/login" method="POST">
+        <service class="EzLaunch\Customer\Api\CustomerTokenServiceInterface" method="login"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+
+    <route url="/V2/addresses" method="POST">
+        <service class="Magento\Customer\Api\AddressRepositoryInterface" method="save"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
+</routes>

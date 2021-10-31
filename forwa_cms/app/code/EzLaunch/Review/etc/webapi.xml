@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © EzLaunch, Inc. All rights reserved.
+ */
+-->
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
+
+    <route url="/V2/reviews" method="POST">
+        <service class="Divante\ReviewApi\Api\ReviewRepositoryInterface" method="save"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
+    
+</routes>
