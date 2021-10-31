@@ -10,8 +10,6 @@ services:
     volumes:
       - ./docker/nginx/log:/var/log/nginx
       - ./docker/nginx/:/etc/nginx/conf.d/
-    depends_on:
-      - forwa_cms
     
 
   es01:

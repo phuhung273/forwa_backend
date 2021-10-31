@@ -5,7 +5,7 @@ WORKDIR /app
 COPY . /app
     
 RUN composer install --optimize-autoloader --no-dev --ignore-platform-reqs
-
+RUN composer update
 
 
 FROM php:7.4-fpm
