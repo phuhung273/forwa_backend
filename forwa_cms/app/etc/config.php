@@ -335,6 +335,7 @@ return [
         'EzLaunch_Customer' => 1,
         'EzLaunch_Product' => 1,
         'EzLaunch_Quote' => 1,
+        'EzLaunch_Review' => 1,
         'EzLaunch_Sales' => 1,
         'Klarna_Core' => 1,
         'Klarna_Ordermanagement' => 1,
