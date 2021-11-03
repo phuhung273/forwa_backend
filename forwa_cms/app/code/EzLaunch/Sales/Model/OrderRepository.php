@@ -116,6 +116,7 @@ class OrderRepository extends \Magento\Sales\Model\OrderRepository implements Or
         parent::__construct(
             $metadata,
             $orderSearchResultFactory,
+            $logger,
             $collectionProcessor,
             $orderExtensionFactory,
             $orderTaxManagement,

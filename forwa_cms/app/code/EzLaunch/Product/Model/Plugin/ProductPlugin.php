@@ -276,7 +276,7 @@ class ProductPlugin
             $extensionAttributes->setIsDisabled(false);
         } else {
             $cartItems = $this->cartItemRepository->getListOfCustomerContain($customerId, $product->getId());
-            $this->logger->debug('Number of items: ' . count($cartItems));
+            // $this->logger->debug('Number of items: ' . count($cartItems));
             $extensionAttributes->setIsDisabled(count($cartItems) > 0);
         }
     }
