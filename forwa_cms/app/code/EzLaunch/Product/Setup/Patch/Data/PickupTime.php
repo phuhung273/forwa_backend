@@ -60,7 +60,7 @@ class PickupTime implements DataPatchInterface
                 'input' => 'text',
                 'global' => ScopedAttributeInterface::SCOPE_GLOBAL,
                 'visible' => true,
-                'required' => true,
+                'required' => false,
                 'default' => '',
                 'visible_on_front' => false,
                 'used_in_product_listing' => true,
