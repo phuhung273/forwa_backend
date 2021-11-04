@@ -22,4 +22,11 @@ interface CustomerTokenServiceInterface
      * @throws \Magento\Framework\Exception\AuthenticationException
      */
     public function login($username, $password);
+
+    /**
+     * Handshake
+     * 
+     * @return Data\HandshakeResponseInterface
+     */
+    public function handshake();
 }

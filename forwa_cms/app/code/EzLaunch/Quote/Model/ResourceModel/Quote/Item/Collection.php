@@ -52,6 +52,8 @@ class Collection extends AbstractCollection
                 ['item_id AS order_item_id']
             );
 
+        // $this->_logger->debug($this->getSelect());
+
         return $this;
     }
 

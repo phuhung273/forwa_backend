@@ -9,23 +9,18 @@
 
     <route url="/V2/register" method="POST">
         <service class="EzLaunch\Customer\Api\AccountManagementInterface" method="register"/>
-        <resources>
-            <resource ref="anonymous"/>
-        </resources>
     </route>
 
     <route url="/V2/socialLogin" method="POST">
         <service class="EzLaunch\Customer\Api\AccountManagementInterface" method="socialLogin"/>
-        <resources>
-            <resource ref="anonymous"/>
-        </resources>
     </route>
 
     <route url="/V2/login" method="POST">
         <service class="EzLaunch\Customer\Api\CustomerTokenServiceInterface" method="login"/>
-        <resources>
-            <resource ref="anonymous"/>
-        </resources>
+    </route>
+
+    <route url="/V2/handshake" method="POST">
+        <service class="EzLaunch\Customer\Api\CustomerTokenServiceInterface" method="handshake"/>
     </route>
 
     <route url="/V2/addresses" method="POST">
