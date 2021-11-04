@@ -1,4 +1,7 @@
 <?php
+/**
+ * Copyright © EzLaunch, Inc. All rights reserved.
+ */
 
 namespace EzLaunch\Customer\Api\Data;
 

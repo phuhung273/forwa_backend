@@ -7,6 +7,8 @@ namespace EzLaunch\Customer\Model;
 
 use Magento\Customer\Api\AccountManagementInterface;
 use EzLaunch\Customer\Api\CustomerTokenServiceInterface;
+use Magento\Authorization\Model\CompositeUserContext;
+use Magento\Customer\Api\CustomerRepositoryInterface;
 use Magento\Integration\Model\CredentialsValidator;
 use Magento\Integration\Model\Oauth\TokenFactory as TokenModelFactory;
 use Magento\Integration\Model\ResourceModel\Oauth\Token\CollectionFactory as TokenCollectionFactory;
@@ -67,6 +69,21 @@ class CustomerTokenService implements CustomerTokenServiceInterface
     private $storeManager;
 
     /**
+     * @var CompositeUserContext
+     */
+    private $userContext;
+
+    /**
+     * @var CustomerRepositoryInterface
+     */
+    private $customerRepository;
+
+    /**
+     * @var \EzLaunch\Customer\Model\Data\HandshakeResponseFactory
+     */
+    private $handshakeResponseFactory;
+
+    /**
      * Initialize service
      *
      * @param TokenModelFactory $tokenModelFactory
@@ -75,6 +92,9 @@ class CustomerTokenService implements CustomerTokenServiceInterface
      * @param \Magento\Integration\Model\CredentialsValidator $validatorHelper
      * @param Data\LoginResponseFactory $loginResponseFactory
      * @param StoreManagerInterface $storeManager
+     * @param CompositeUserContext $userContext
+     * @param CustomerRepositoryInterface $customerRepository
+     * @param \EzLaunch\Customer\Model\Data\HandshakeResponseFactory $handshakeResponseFactory
      * @param \Magento\Framework\Event\ManagerInterface $eventManager
      */
     public function __construct(
@@ -84,6 +104,9 @@ class CustomerTokenService implements CustomerTokenServiceInterface
         CredentialsValidator $validatorHelper,
         \EzLaunch\Customer\Model\Data\LoginResponseFactory $loginResponseFactory,
         StoreManagerInterface $storeManager,
+        CompositeUserContext $userContext,
+        CustomerRepositoryInterface $customerRepository,
+        \EzLaunch\Customer\Model\Data\HandshakeResponseFactory $handshakeResponseFactory,
         ManagerInterface $eventManager = null
     ) {
         $this->tokenModelFactory = $tokenModelFactory;
@@ -95,6 +118,9 @@ class CustomerTokenService implements CustomerTokenServiceInterface
 
         $this->_loginResponseFactory = $loginResponseFactory;
         $this->storeManager = $storeManager;
+        $this->userContext = $userContext;
+        $this->customerRepository = $customerRepository;
+        $this->handshakeResponseFactory = $handshakeResponseFactory;
     }
 
     /**
@@ -128,6 +154,27 @@ class CustomerTokenService implements CustomerTokenServiceInterface
         $loginResponse->setStoreWebsiteId($store->getWebsiteId());
         
         return $loginResponse;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function handshake()
+    {
+        $customerId = $this->userContext->getUserId();
+
+        $handshakeResponse = $this->handshakeResponseFactory->create();
+        
+        if (!isset($customerId)) {
+            return $handshakeResponse;
+        }
+
+        $customer = $this->customerRepository->getById($customerId);
+        $token = $this->tokenModelFactory->create()->createCustomerToken($customer->getId())->getToken();
+
+        $handshakeResponse->setAccessToken($token);
+        
+        return $handshakeResponse;
     }
 
     /**
