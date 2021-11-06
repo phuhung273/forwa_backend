@@ -238,28 +238,32 @@ class ProductPlugin
         $websiteId = $this->arrayHelper->getFirstNonDefaultIdOrNull($product->getWebsiteIds());
 
         if (!isset($websiteId)) {
-            $this->logger->debug('No website id');
+            // $this->logger->debug('No website id');
             return;
         }
 
         $storeIds = $this->websiteRepository->getById($websiteId)->getStoreIds();
         $storeId = $this->arrayHelper->getFirstNonDefaultIdOrNull($storeIds);
         if (!isset($storeId)) {
-            $this->logger->debug('No store id');
+            // $this->logger->debug('No store id');
             return;
         }
 
         $customer = $this->customerHelper->getByStoreId($storeId);
 
         if (!isset($customer)) {
-            $this->logger->debug('No customer');
+            // $this->logger->debug('No customer');
             return;
         }
 
         $extensionAttributes->setSellerName($customer->getName());
 
-        $customerId = $this->userContext->getUserId();
-        $extensionAttributes->setIsDisabled($customerId == null);
+        // $customerId = $this->userContext->getUserId();
+        // $extensionAttributes->setIsDisabled($customerId == null);
+
+        $defaultBilling = $customer->getDefaultBillingAddress();
+        $extensionAttributes->setLatitude($defaultBilling->getCustomAttribute('latitude'));
+        $extensionAttributes->setLongitude($defaultBilling->getCustomAttribute('longitude'));
     }
 
     /**

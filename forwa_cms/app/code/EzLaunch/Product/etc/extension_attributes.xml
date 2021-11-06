@@ -12,5 +12,7 @@
         <attribute code="quantity" type="int" />
         <attribute code="seller_name" type="string" />
         <attribute code="is_disabled" type="boolean" />
+        <attribute code="latitude" type="string" />
+        <attribute code="longitude" type="string" />
     </extension_attributes>
 </config>
