@@ -50,8 +50,8 @@ class CustomerHelper extends AbstractHelper{
     /**
      * Get customer by storeId
      *
-     * @param  int $storeId
-     * @return Customer
+     * @param int $storeId
+     * @return \Magento\Customer\Model\Customer
      */
     public function getByStoreId(int $storeId) {
         // TODO: catch exception multiple customer in store & no customer
@@ -90,5 +90,15 @@ class CustomerHelper extends AbstractHelper{
         $quoteAddress->setCustomerId($customer->getId());
 
         return $quoteAddress;
+    }
+
+    /**
+     * Get customer default billing as quote address
+     *
+     * @param  CustomerInterface $customer
+     * @return \Magento\Customer\Api\Data\AddressInterface
+     */
+    public function getDefaultBilling(CustomerInterface $customer){
+        return $this->addressRepository->getById($customer->getDefaultBilling());
     }
 }
