@@ -261,9 +261,9 @@ class ProductPlugin
         // $customerId = $this->userContext->getUserId();
         // $extensionAttributes->setIsDisabled($customerId == null);
 
-        $defaultBilling = $customer->getDefaultBillingAddress();
-        $extensionAttributes->setLatitude($defaultBilling->getCustomAttribute('latitude'));
-        $extensionAttributes->setLongitude($defaultBilling->getCustomAttribute('longitude'));
+        $defaultBilling = $this->customerHelper->getDefaultBilling($customer->getDataModel());
+        $extensionAttributes->setLatitude($defaultBilling->getCustomAttribute('latitude')->getValue());
+        $extensionAttributes->setLongitude($defaultBilling->getCustomAttribute('longitude')->getValue());
     }
 
     /**

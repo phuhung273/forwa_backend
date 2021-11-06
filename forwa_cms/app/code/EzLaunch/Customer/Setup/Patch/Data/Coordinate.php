@@ -52,11 +52,11 @@ class Coordinate implements DataPatchInterface
      */
     public function apply()
     {
-        $customerSetup = $this->customersetupFactory->create(['setup' => $this->moduleDataSetup]);
+        $customerSetup = $this->customerSetupFactory->create(['setup' => $this->moduleDataSetup]);
         // $customerEntity = $customerSetup->getEavConfig()->getEntityType('customer');
         $customerEntity = $customerSetup->getEavConfig()->getEntityType('customer_address');
         $attributeSetId = $customerEntity->getDefaultAttributeSetId();
-        $attributeSet = $this->attributesetFactory->create();
+        $attributeSet = $this->attributeSetFactory->create();
         $attributeGroupId = $attributeSet->getDefaultGroupId($attributeSetId);
 
         $this->addAttribute($customerSetup, self::LATITUDE_ATTRIBUTE_CODE, $attributeSetId, $attributeGroupId);
