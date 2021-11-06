@@ -6,11 +6,11 @@
 
 namespace EzLaunch\Customer\Setup\Patch\Data;
 
-use Magento\Customer\Api\AddressMetadataInterface;
-use Magento\Eav\Setup\EavSetupFactory;
-use Magento\Eav\Setup\EavSetup;
 use Magento\Framework\Setup\Patch\DataPatchInterface;
-use Magento\Eav\Model\Config;
+use Magento\Customer\Setup\CustomerSetupFactory;
+use Magento\Customer\Api\AddressMetadataInterface;
+use Magento\Customer\Setup\CustomerSetup;
+use Magento\Eav\Model\Entity\Attribute\SetFactory as AttributeSetFactory;
 
 class Coordinate implements DataPatchInterface
 {
@@ -21,31 +21,30 @@ class Coordinate implements DataPatchInterface
      * @var \Magento\Framework\Setup\ModuleDataSetupInterface
      */
     private $moduleDataSetup;
-
+    
     /**
-     * @var EavSetupFactory
+     * @var CustomerSetupFactory
      */
-    private $eavSetupFactory;
+    protected $customerSetupFactory;
 
     /**
-     * @var Config
+     * @var AttributeSetFactory
      */
-    private $eavConfig;
+    private $attributeSetFactory;
 
     /**
-     * Constructor.
      * @param \Magento\Framework\Setup\ModuleDataSetupInterface $moduleDataSetup
-     * @param EavSetupFactory $eavSetupFactory
-     * @param Config $eavConfig
+     * @param CustomerSetupFactory $customerSetupFactory
+     * @param AttributeSetFactory $attributeSetFactory
      */
     public function __construct(
         \Magento\Framework\Setup\ModuleDataSetupInterface $moduleDataSetup,
-        EavSetupFactory $eavSetupFactory,
-        Config $eavConfig
+        CustomerSetupFactory $customerSetupFactory,
+        AttributeSetFactory $attributeSetFactory
     ) {
         $this->moduleDataSetup = $moduleDataSetup;
-        $this->eavSetupFactory = $eavSetupFactory;
-        $this->eavConfig = $eavConfig;
+        $this->customerSetupFactory = $customerSetupFactory;
+        $this->attributeSetFactory = $attributeSetFactory;
     }
 
     /**
@@ -53,11 +52,15 @@ class Coordinate implements DataPatchInterface
      */
     public function apply()
     {
-        /** @var EavSetup $eavSetup */
-        $eavSetup = $this->eavSetupFactory->create(['setup' => $this->moduleDataSetup]);
+        $customerSetup = $this->customersetupFactory->create(['setup' => $this->moduleDataSetup]);
+        // $customerEntity = $customerSetup->getEavConfig()->getEntityType('customer');
+        $customerEntity = $customerSetup->getEavConfig()->getEntityType('customer_address');
+        $attributeSetId = $customerEntity->getDefaultAttributeSetId();
+        $attributeSet = $this->attributesetFactory->create();
+        $attributeGroupId = $attributeSet->getDefaultGroupId($attributeSetId);
 
-        $this->addAttribute($eavSetup, self::LATITUDE_ATTRIBUTE_CODE);
-        $this->addAttribute($eavSetup, self::LONGITUDE_ATTRIBUTE_CODE);
+        $this->addAttribute($customerSetup, self::LATITUDE_ATTRIBUTE_CODE, $attributeSetId, $attributeGroupId);
+        $this->addAttribute($customerSetup, self::LONGITUDE_ATTRIBUTE_CODE, $attributeSetId, $attributeGroupId);
     }
 
     /**
@@ -76,8 +79,8 @@ class Coordinate implements DataPatchInterface
         return [];
     }
 
-    private function addAttribute(EavSetup $eavSetup, string $attributeCode){
-        $eavSetup->addAttribute(
+    private function addAttribute(CustomerSetup $customerSetup, string $attributeCode, $attributeSetId, $attributeGroupId){
+        $customerSetup->addAttribute(
             AddressMetadataInterface::ENTITY_TYPE_ADDRESS,
             $attributeCode,
             [
@@ -92,15 +95,19 @@ class Coordinate implements DataPatchInterface
             ]
         );
 
-        $customAttribute = $this->eavConfig->getAttribute(
+        $customAttribute = $customerSetup->getEavConfig()->getAttribute(
             AddressMetadataInterface::ENTITY_TYPE_ADDRESS, 
             $attributeCode
         );
 
-        $customAttribute->setData('used_in_forms', [
-            'adminhtml_customer_address',
-            'customer_address_edit',
-            'customer_register_address',
+        $customAttribute->addData([
+            'attribute_set_id' => $attributeSetId,
+            'attribute_group_id' => $attributeGroupId,
+            'used_in_forms' => [
+                'adminhtml_customer_address',
+                'customer_address_edit',
+                'customer_register_address',
+            ],
         ]);
         
         $customAttribute->save();

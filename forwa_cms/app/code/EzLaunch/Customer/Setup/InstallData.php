@@ -6,9 +6,10 @@
 
 namespace EzLaunch\Customer\Setup;
 
+use Magento\Customer\Setup\CustomerSetupFactory;
 use Magento\Customer\Api\AddressMetadataInterface;
-use Magento\Eav\Model\Config;
-use Magento\Eav\Setup\EavSetup;
+use Magento\Customer\Setup\CustomerSetup;
+use Magento\Eav\Model\Entity\Attribute\SetFactory as AttributeSetFactory;
 use Magento\Framework\Setup\InstallDataInterface;
 use Magento\Framework\Setup\ModuleContextInterface;
 use Magento\Framework\Setup\ModuleDataSetupInterface;
@@ -19,40 +20,48 @@ class InstallData implements InstallDataInterface
     const LONGITUDE_ATTRIBUTE_CODE = 'longitude';
 
 	/**
-     * @var \Magento\Eav\Setup\EavSetupFactory
+     * @var CustomerSetupFactory
      */
-    private $eavSetupFactory;
+    protected $customerSetupFactory;
 
     /**
-     * @var Config
+     * @var AttributeSetFactory
      */
-    private $eavConfig;
+    private $attributeSetFactory;
 
     /**
      * Constructor.
-     * @param \Magento\Eav\Setup\EavSetupFactory $eavSetupFactory
-     * @param Config $eavConfig
+     * @param CustomerSetupFactory $customerSetupFactory
+     * @param AttributeSetFactory $attributeSetFactory
      */
 	public function __construct(
-        \Magento\Eav\Setup\EavSetupFactory $eavSetupFactory,
-        Config $eavConfig
+        CustomerSetupFactory $customerSetupFactory,
+        AttributeSetFactory $attributeSetFactory
     ) {
-		$this->eavSetupFactory = $eavSetupFactory;
-        $this->eavConfig = $eavConfig;
+		$this->customerSetupFactory = $customerSetupFactory;
+        $this->attributeSetFactory = $attributeSetFactory;
 	}
 
 	public function install(ModuleDataSetupInterface $setup, ModuleContextInterface $context)
 	{
-		/** @var EavSetup $eavSetup */
-        $eavSetup = $this->eavSetupFactory->create(['setup' => $setup]);
+		/** @var CustomerSetup $customerSetup */
+        $customerSetup = $this->customerSetupFactory->create(['setup' => $setup]);
 
-        $this->addAttribute($eavSetup, self::LATITUDE_ATTRIBUTE_CODE);
-        $this->addAttribute($eavSetup, self::LONGITUDE_ATTRIBUTE_CODE);
+        // $customerEntity = $customerSetup->getEavConfig()->getEntityType('customer');
+        $customerEntity = $customerSetup->getEavConfig()->getEntityType('customer_address');
+        $attributeSetId = $customerEntity->getDefaultAttributeSetId();
+
+        /** @var $attributeSet AttributeSet */
+        $attributeSet = $this->attributeSetFactory->create();
+        $attributeGroupId = $attributeSet->getDefaultGroupId($attributeSetId);
+
+        $this->addLatLong($customerSetup, self::LATITUDE_ATTRIBUTE_CODE, $attributeSetId, $attributeGroupId);
+        $this->addLatLong($customerSetup, self::LONGITUDE_ATTRIBUTE_CODE, $attributeSetId, $attributeGroupId);
 
 	}
 
-    private function addAttribute(EavSetup $eavSetup, string $attributeCode){
-        $eavSetup->addAttribute(
+    private function addLatLong(CustomerSetup $customerSetup, string $attributeCode, $attributeSetId, $attributeGroupId){
+        $customerSetup->addAttribute(
             AddressMetadataInterface::ENTITY_TYPE_ADDRESS,
             $attributeCode,
             [
@@ -67,15 +76,19 @@ class InstallData implements InstallDataInterface
             ]
         );
 
-        $customAttribute = $this->eavConfig->getAttribute(
-            AddressMetadataInterface::ENTITY_TYPE_ADDRESS, 
+        $customAttribute = $customerSetup->getEavConfig()->getAttribute(
+            AddressMetadataInterface::ENTITY_TYPE_ADDRESS,
             $attributeCode
         );
 
-        $customAttribute->setData('used_in_forms', [
-            'adminhtml_customer_address',
-            'customer_address_edit',
-            'customer_register_address',
+        $customAttribute->addData([
+            'attribute_set_id' => $attributeSetId,
+            'attribute_group_id' => $attributeGroupId,
+            'used_in_forms' => [
+                'adminhtml_customer_address',
+                'customer_address_edit',
+                'customer_register_address',
+            ],
         ]);
         
         $customAttribute->save();
