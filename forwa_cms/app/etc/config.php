@@ -333,6 +333,7 @@ return [
         'Dotdigitalgroup_Sms' => 1,
         'EzLaunch_Core' => 1,
         'EzLaunch_Customer' => 1,
+        'EzLaunch_FirebaseCloudMessaging' => 1,
         'EzLaunch_Product' => 1,
         'EzLaunch_Quote' => 1,
         'EzLaunch_Review' => 1,

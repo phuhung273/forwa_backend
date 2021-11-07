@@ -5,6 +5,7 @@
 
 namespace EzLaunch\Quote\Model\Quote\Item;
 
+use EzLaunch\FirebaseCloudMessaging\Api\FcmServiceInterface;
 use EzLaunch\Quote\Api\CartItemRepositoryInterface;
 use EzLaunch\Quote\Model\ResourceModel\Quote\Item\CollectionFactory as CartItemCollectionFactory;
 
@@ -92,6 +93,11 @@ class Repository extends MagentoCartItemRepository implements CartItemRepository
     protected $logger;
 
     /**
+     * @var FcmServiceInterface
+     */
+    protected $fcmService;
+
+    /**
      * @var array
      */
     private $addressesToSync = [];
@@ -113,6 +119,7 @@ class Repository extends MagentoCartItemRepository implements CartItemRepository
      * @param CartItemCollectionFactory $cartItemCollectionFactory
      * @param \EzLaunch\Quote\Model\CartItemSearchResultsFactory $cartItemSearchResultsFactory
      * @param LoggerInterface $logger
+     * @param FcmServiceInterface $fcmService
      * @param CartItemProcessorInterface[] $cartItemProcessors
      */
     public function __construct(
@@ -131,6 +138,7 @@ class Repository extends MagentoCartItemRepository implements CartItemRepository
         CartItemCollectionFactory $cartItemCollectionFactory,
         \EzLaunch\Quote\Model\CartItemSearchResultsFactory $cartItemSearchResultsFactory,
         LoggerInterface $logger,
+        FcmServiceInterface $fcmService,
         array $cartItemProcessors = []
     ) {
         parent::__construct(
@@ -152,6 +160,7 @@ class Repository extends MagentoCartItemRepository implements CartItemRepository
         $this->cartItemCollectionFactory = $cartItemCollectionFactory;
         $this->cartItemSearchResultsFactory = $cartItemSearchResultsFactory;
         $this->logger = $logger;
+        $this->fcmService = $fcmService;
     }
     
     /**
@@ -189,6 +198,12 @@ class Repository extends MagentoCartItemRepository implements CartItemRepository
             $quote->getId(),
             $paymentMethod,
             $defaultQuoteBilling,
+        );
+
+        $this->fcmService->send(
+            'cjg-L2XXSee9jGwWYqK-ii:APA91bFK0592Fn87VqEZ8kQ27LJoIDSDO2J87hVCPAmcMpH5qBvyDHnEAsxu54-RglDOesfjCueYV4s6t2YC01uSflGLNi99vK-PzoCNEHpl5S1fCpL_EddvVTtGMIy_c8GDM4EFM4u1',
+            'Forwa',
+            'Hello world nhaaaaa'
         );
 
         return $orderId;
