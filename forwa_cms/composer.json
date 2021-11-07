@@ -13,6 +13,7 @@
     "version": "2.4.3",
     "require": {
         "divante/magento2-review-api": "^1.5",
+        "kreait/firebase-php": "^5.25",
         "magento/composer-dependency-version-audit-plugin": "~0.1",
         "magento/composer-root-update-plugin": "~1.1",
         "magento/product-community-edition": "2.4.3",

@@ -73,3 +73,6 @@ atlassian*
 
 # Magento credentials
 auth.json
+
+# Firebase credentials
+*firebase-adminsdk*.json
