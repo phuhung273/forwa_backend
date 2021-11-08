@@ -8,5 +8,10 @@
 
     <preference for="EzLaunch\FirebaseCloudMessaging\Api\FcmServiceInterface"
                 type="EzLaunch\FirebaseCloudMessaging\Model\FcmService" />
+
+    <preference for="EzLaunch\FirebaseCloudMessaging\Api\Data\FirebaseTokenInterface" 
+                type="EzLaunch\FirebaseCloudMessaging\Model\FirebaseToken" />
+    <preference for="EzLaunch\FirebaseCloudMessaging\Api\FirebaseTokenRepositoryInterface"
+                type="EzLaunch\FirebaseCloudMessaging\Model\FirebaseTokenRepository" />
     
 </config>
