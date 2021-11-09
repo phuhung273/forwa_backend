@@ -8,6 +8,7 @@ namespace EzLaunch\Customer\Model;
 
 use EzLaunch\Core\Helper\StringHelper as EzLaunchStringHelper;
 use EzLaunch\Customer\Api\AccountManagementInterface;
+use EzLaunch\FirebaseCloudMessaging\Api\FirebaseTokenRepositoryInterface;
 use Magento\Customer\Api\Data\CustomerInterface;
 use Magento\Customer\Model\CustomerFactory;
 use Magento\Store\Model\Group as StoreGroup;
@@ -415,6 +416,11 @@ class AccountManagement implements AccountManagementInterface
      * @var Data\LoginResponseFactory
      */
     protected $_loginResponseFactory;
+
+    /**
+     * @var FirebaseTokenRepositoryInterface
+     */
+    private $firebaseTokenRepository;
     
     /**
      * @param CustomerFactory $customerFactory
@@ -443,6 +449,7 @@ class AccountManagement implements AccountManagementInterface
      * @param ExtensibleDataObjectConverter $extensibleDataObjectConverter
      * @param TokenModelFactory $tokenModelFactory
      * @param Data\LoginResponseFactory $loginResponseFactory
+     * @param FirebaseTokenRepositoryInterface $firebaseTokenRepository
      * @param CredentialsValidator|null $credentialsValidator
      * @param DateTimeFactory|null $dateTimeFactory
      * @param AccountConfirmation|null $accountConfirmation
@@ -489,6 +496,7 @@ class AccountManagement implements AccountManagementInterface
         ExtensibleDataObjectConverter $extensibleDataObjectConverter,
         TokenModelFactory $tokenModelFactory,
         \EzLaunch\Customer\Model\Data\LoginResponseFactory $loginResponseFactory,
+        FirebaseTokenRepositoryInterface $firebaseTokenRepository,
         CredentialsValidator $credentialsValidator = null,
         DateTimeFactory $dateTimeFactory = null,
         AccountConfirmation $accountConfirmation = null,
@@ -546,13 +554,13 @@ class AccountManagement implements AccountManagementInterface
         $this->ezLaunchStringHelper = $ezLaunchStringHelper;
         $this->tokenModelFactory = $tokenModelFactory;
         $this->_loginResponseFactory = $loginResponseFactory;
+        $this->firebaseTokenRepository = $firebaseTokenRepository;
     }
 
     /**
      * @inheritdoc
-     *
      */
-    public function socialLogin(CustomerInterface $customer)
+    public function socialLogin($customer, $firebaseToken)
     {
         try {
             $customer = $this->customerRepository->get($customer->getEmail());
@@ -565,6 +573,8 @@ class AccountManagement implements AccountManagementInterface
         }
 
         $token = $this->tokenModelFactory->create()->createCustomerToken($customer->getId())->getToken();
+
+        $this->firebaseTokenRepository->save($firebaseToken, $customer->getId());
 
         $loginResponse = $this->_loginResponseFactory->create();
         $loginResponse->setCustomer($customer);

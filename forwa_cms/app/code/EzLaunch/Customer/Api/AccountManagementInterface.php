@@ -39,10 +39,9 @@ interface AccountManagementInterface
      * Login or register an account with email after verified by social platform. Send greeting email
      *
      * @param \Magento\Customer\Api\Data\CustomerInterface $customer
+     * @param \EzLaunch\FirebaseCloudMessaging\Api\Data\FirebaseTokenInterface $firebaseToken
      * @return Data\LoginResponseInterface
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function socialLogin(
-        \Magento\Customer\Api\Data\CustomerInterface $customer
-    );
+    public function socialLogin($customer, $firebaseToken);
 }

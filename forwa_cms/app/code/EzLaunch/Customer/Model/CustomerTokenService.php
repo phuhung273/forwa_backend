@@ -7,6 +7,7 @@ namespace EzLaunch\Customer\Model;
 
 use Magento\Customer\Api\AccountManagementInterface;
 use EzLaunch\Customer\Api\CustomerTokenServiceInterface;
+use EzLaunch\FirebaseCloudMessaging\Api\FirebaseTokenRepositoryInterface;
 use Magento\Authorization\Model\CompositeUserContext;
 use Magento\Customer\Api\CustomerRepositoryInterface;
 use Magento\Integration\Model\CredentialsValidator;
@@ -84,6 +85,11 @@ class CustomerTokenService implements CustomerTokenServiceInterface
     private $handshakeResponseFactory;
 
     /**
+     * @var FirebaseTokenRepositoryInterface
+     */
+    private $firebaseTokenRepository;
+
+    /**
      * Initialize service
      *
      * @param TokenModelFactory $tokenModelFactory
@@ -95,6 +101,7 @@ class CustomerTokenService implements CustomerTokenServiceInterface
      * @param CompositeUserContext $userContext
      * @param CustomerRepositoryInterface $customerRepository
      * @param \EzLaunch\Customer\Model\Data\HandshakeResponseFactory $handshakeResponseFactory
+     * @param FirebaseTokenRepositoryInterface $firebaseTokenRepository
      * @param \Magento\Framework\Event\ManagerInterface $eventManager
      */
     public function __construct(
@@ -107,6 +114,7 @@ class CustomerTokenService implements CustomerTokenServiceInterface
         CompositeUserContext $userContext,
         CustomerRepositoryInterface $customerRepository,
         \EzLaunch\Customer\Model\Data\HandshakeResponseFactory $handshakeResponseFactory,
+        FirebaseTokenRepositoryInterface $firebaseTokenRepository,
         ManagerInterface $eventManager = null
     ) {
         $this->tokenModelFactory = $tokenModelFactory;
@@ -121,12 +129,13 @@ class CustomerTokenService implements CustomerTokenServiceInterface
         $this->userContext = $userContext;
         $this->customerRepository = $customerRepository;
         $this->handshakeResponseFactory = $handshakeResponseFactory;
+        $this->firebaseTokenRepository = $firebaseTokenRepository;
     }
 
     /**
      * @inheritdoc
      */
-    public function login($username, $password)
+    public function login($username, $password, $firebaseToken)
     {
         $this->validatorHelper->validate($username, $password);
         $this->getRequestThrottler()->throttle($username, RequestThrottler::USER_TYPE_CUSTOMER);
@@ -144,6 +153,8 @@ class CustomerTokenService implements CustomerTokenServiceInterface
         $this->eventManager->dispatch('customer_login', ['customer' => $customerDataObject]);
         $this->getRequestThrottler()->resetAuthenticationFailuresCount($username, RequestThrottler::USER_TYPE_CUSTOMER);
         $token = $this->tokenModelFactory->create()->createCustomerToken($customerDataObject->getId())->getToken();
+
+        $this->firebaseTokenRepository->save($firebaseToken, $customerDataObject->getId());
 
         $loginResponse = $this->_loginResponseFactory->create();
         $loginResponse->setCustomer($customerDataObject);
@@ -189,5 +200,14 @@ class CustomerTokenService implements CustomerTokenServiceInterface
             return \Magento\Framework\App\ObjectManager::getInstance()->get(RequestThrottler::class);
         }
         return $this->requestThrottler;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function logout($deviceName, $customerId)
+    {
+        $tokenId = $this->firebaseTokenRepository->delete($customerId, $deviceName);
+        return $tokenId;
     }
 }

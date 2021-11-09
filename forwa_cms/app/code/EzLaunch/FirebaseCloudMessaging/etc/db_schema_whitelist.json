@@ -1,0 +1,14 @@
+{
+    "customer_firebase_token": {
+        "column": {
+            "entity_id": true,
+            "customer_id": true,
+            "value": true,
+            "device_name": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "CUSTOMER_FIREBASE_TOKEN_CUSTOMER_ID_CUSTOMER_ENTITY_ENTITY_ID": true
+        }
+    }
+}

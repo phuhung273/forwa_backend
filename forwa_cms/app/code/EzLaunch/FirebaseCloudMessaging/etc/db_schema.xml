@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © EzLaunch, Inc. All rights reserved.
+ */
+-->
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="customer_firebase_token" resource="default" engine="innodb" comment="Customer Firebase Token Table">
+        <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" identity="true"
+                comment="Entity ID"/>
+        <column xsi:type="int" name="customer_id" unsigned="true" nullable="false" identity="false"
+                comment="Customer ID"/>
+        <column xsi:type="varchar" name="value" nullable="false" length="255" comment="Token"/>
+        <column xsi:type="varchar" name="device_name" nullable="false" length="64" comment="Device Name"/>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" 
+                referenceId="CUSTOMER_FIREBASE_TOKEN_CUSTOMER_ENTITY_ENTITY_ID" 
+                table="customer_firebase_token" 
+                column="customer_id" 
+                referenceTable="customer_entity" 
+                referenceColumn="entity_id" 
+                onDelete="CASCADE"
+        />
+    </table>
+</schema>
