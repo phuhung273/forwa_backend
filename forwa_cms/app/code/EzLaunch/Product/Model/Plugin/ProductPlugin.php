@@ -7,6 +7,7 @@ namespace EzLaunch\Product\Model\Plugin;
 
 use EzLaunch\Core\Helper\ArrayHelper;
 use EzLaunch\Core\Helper\CustomerHelper;
+use EzLaunch\Core\Helper\ProductHelper;
 use EzLaunch\Quote\Api\CartItemRepositoryInterface;
 use Magento\Authorization\Model\CompositeUserContext;
 use Magento\Catalog\Api\Data\ProductExtensionFactory;
@@ -55,6 +56,11 @@ class ProductPlugin
     private $customerHelper;
 
     /**
+     * @var ProductHelper
+     */
+    private $productHelper;
+
+    /**
      * @var LoggerInterface
      */
     private $logger;
@@ -83,6 +89,7 @@ class ProductPlugin
      * @param WebsiteRepositoryInterface $websiteRepository
      * @param ArrayHelper $arrayHelper
      * @param CustomerHelper $customerHelper
+     * @param ProductHelper $productHelper
      * @param LoggerInterface $logger
      * @param CompositeUserContext $userContext
      * @param CartItemRepositoryInterface $cartItemRepository
@@ -95,6 +102,7 @@ class ProductPlugin
         WebsiteRepositoryInterface $websiteRepository,
         ArrayHelper $arrayHelper,
         CustomerHelper $customerHelper,
+        ProductHelper $productHelper,
         LoggerInterface $logger,
         CompositeUserContext $userContext,
         CartItemRepositoryInterface $cartItemRepository,
@@ -106,6 +114,7 @@ class ProductPlugin
         $this->websiteRepository = $websiteRepository;
         $this->arrayHelper = $arrayHelper;
         $this->customerHelper = $customerHelper;
+        $this->productHelper = $productHelper;
         $this->logger = $logger;
         $this->userContext = $userContext;
         $this->cartItemRepository = $cartItemRepository;
@@ -235,21 +244,7 @@ class ProductPlugin
      * @return void
      */
     private function collectSeller(ProductInterface $product, ExtensionAttributesInterface $extensionAttributes){
-        $websiteId = $this->arrayHelper->getFirstNonDefaultIdOrNull($product->getWebsiteIds());
-
-        if (!isset($websiteId)) {
-            // $this->logger->debug('No website id');
-            return;
-        }
-
-        $storeIds = $this->websiteRepository->getById($websiteId)->getStoreIds();
-        $storeId = $this->arrayHelper->getFirstNonDefaultIdOrNull($storeIds);
-        if (!isset($storeId)) {
-            // $this->logger->debug('No store id');
-            return;
-        }
-
-        $customer = $this->customerHelper->getByStoreId($storeId);
+        $customer = $this->productHelper->getSellerOfProduct($product);
 
         if (!isset($customer)) {
             // $this->logger->debug('No customer');

@@ -27,7 +27,7 @@ class Collection extends AbstractCollection
     }
     
     /**
-     * Add customer info to quote item, we need
+     * Add customer info to quote item
      *
      * @param  int $productId
      * @return $this

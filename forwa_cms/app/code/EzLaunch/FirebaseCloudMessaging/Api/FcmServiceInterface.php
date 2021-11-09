@@ -15,8 +15,8 @@ interface FcmServiceInterface
      * Send notification to device with token
      *
      * @param string $token
-     * @param string $title
+     * @param string|null $title
      * @param string $body
      */
-    public function send(string $token, string $title, string $body);
+    public function send($token, $title = null, $body);
 }

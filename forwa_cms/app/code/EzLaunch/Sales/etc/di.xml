@@ -8,5 +8,8 @@
 
     <preference for="EzLaunch\Sales\Api\OrderRepositoryInterface"
                 type="EzLaunch\Sales\Model\OrderRepository" />
+
+    <preference for="EzLaunch\Sales\Api\InvoiceOrderInterface" 
+                type="EzLaunch\Sales\Model\InvoiceOrder"/>
     
 </config>

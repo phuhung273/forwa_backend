@@ -80,4 +80,36 @@ class FirebaseToken extends \Magento\Framework\Model\AbstractModel implements Fi
     public function setCustomerId($customerId) {
         return $this->setData(seLF::KEY_CUSTOMER_ID, $customerId);
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function getCustomerFirstName()
+    {
+        return $this->getData(self::KEY_CUSTOMER_FIRSTNAME);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setCustomerFirstName($name)
+    {
+        return $this->setData(self::KEY_CUSTOMER_FIRSTNAME, $name);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getCustomerLastName()
+    {
+        return $this->getData(self::KEY_CUSTOMER_LASTNAME);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setCustomerLastName($name)
+    {
+        return $this->setData(self::KEY_CUSTOMER_LASTNAME, $name);
+    }
 }

@@ -19,6 +19,9 @@ interface FirebaseTokenInterface
     const KEY_CUSTOMER_ID = 'customer_id';
     const KEY_VALUE = 'value';
     const KEY_DEVICE_NAME = 'device_name';
+
+    const KEY_CUSTOMER_FIRSTNAME = 'customer_firstname';
+    const KEY_CUSTOMER_LASTNAME = 'customer_lastname';
     /**#@-*/
 
     /**
@@ -68,4 +71,34 @@ interface FirebaseTokenInterface
      * @return $this
      */
     public function setCustomerId($customerId);
+
+    /**
+     * Returns the Customer first name.
+     *
+     * @return string|null Customer first name. Otherwise, null.
+     */
+    public function getCustomerFirstName();
+
+    /**
+     * Sets the Customer first name.
+     *
+     * @param string $name
+     * @return $this
+     */
+    public function setCustomerFirstName($name);
+
+    /**
+     * Returns the Customer last name.
+     *
+     * @return string|null Customer last name. Otherwise, null.
+     */
+    public function getCustomerLastName();
+
+    /**
+     * Sets the Customer last name.
+     *
+     * @param string $name
+     * @return $this
+     */
+    public function setCustomerLastName($name);
 }
