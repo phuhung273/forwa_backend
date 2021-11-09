@@ -25,7 +25,6 @@ class FirebaseToken extends \Magento\Framework\Model\AbstractModel implements Fi
      * @param int $customerId
      * @param string $deviceName
      * @return $this
-     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function loadByCustomerIdAndDeviceName($customerId, $deviceName)
     {

@@ -59,7 +59,7 @@ interface FirebaseTokenInterface
     /**
      * Retrieve customer id
      * 
-     * @return int
+     * @return int|null
      */
     public function getCustomerId();
 

@@ -23,7 +23,7 @@ interface FirebaseTokenRepositoryInterface {
     public function save($token, $customerId);
 
     /**
-     * Get firebase token by customer id
+     * Get firebase token by customer id and device name
      *
      * @param int $customerId
      * @param string $deviceName
@@ -31,4 +31,16 @@ interface FirebaseTokenRepositoryInterface {
      * @throws NoSuchEntityException
      */
     public function getByCustomerIdAndDeviceName($customerId, $deviceName);
+
+    /**
+     * Delete firebase token by customer id and device name
+     *
+     * @param int $customerId
+     * @param string $deviceName
+     * @return int token id
+     * @throws NoSuchEntityException
+     * @throws CouldNotSaveException
+     * @throws StateException
+     */
+    public function delete($customerId, $deviceName);
 }

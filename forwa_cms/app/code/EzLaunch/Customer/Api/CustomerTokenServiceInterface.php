@@ -18,10 +18,11 @@ interface CustomerTokenServiceInterface
      *
      * @param string $username
      * @param string $password
+     * @param \EzLaunch\FirebaseCloudMessaging\Api\Data\FirebaseTokenInterface $firebaseToken
      * @return Data\LoginResponseInterface
      * @throws \Magento\Framework\Exception\AuthenticationException
      */
-    public function login($username, $password);
+    public function login($username, $password, $firebaseToken);
 
     /**
      * Handshake
@@ -29,4 +30,13 @@ interface CustomerTokenServiceInterface
      * @return Data\HandshakeResponseInterface
      */
     public function handshake();
+
+    /**
+     * Logout, remove firebase token of device
+     * 
+     * @param string $deviceName
+     * @param int $customerId
+     * @return int
+     */
+    public function logout($deviceName, $customerId);
 }

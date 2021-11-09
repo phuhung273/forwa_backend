@@ -19,6 +19,16 @@
         <service class="EzLaunch\Customer\Api\CustomerTokenServiceInterface" method="login"/>
     </route>
 
+    <route url="/V2/logout" method="POST">
+        <service class="EzLaunch\Customer\Api\CustomerTokenServiceInterface" method="logout"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+
     <route url="/V2/handshake" method="POST">
         <service class="EzLaunch\Customer\Api\CustomerTokenServiceInterface" method="handshake"/>
     </route>

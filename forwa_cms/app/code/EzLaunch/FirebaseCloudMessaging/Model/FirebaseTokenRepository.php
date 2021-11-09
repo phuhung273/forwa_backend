@@ -16,6 +16,7 @@ use Magento\Framework\Exception\TemporaryState\CouldNotSaveException as Temporar
 use Magento\Framework\DB\Adapter\ConnectionException;
 use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Exception\StateException;
 use Psr\Log\LoggerInterface;
 
 class FirebaseTokenRepository implements FirebaseTokenRepositoryInterface 
@@ -75,12 +76,6 @@ class FirebaseTokenRepository implements FirebaseTokenRepositoryInterface
      * @inheritdoc
      */
     public function save($token, $customerId){
-        if ($token->getCustomerId() != $customerId || !isset($customerId)) {
-            throw new LocalizedException(
-                __('Unauthorized')
-            );
-        }
-
         try {
             // TODO: Multiple device
             $tokenModel = $this->getByCustomerIdAndDeviceName($customerId, $token->getDeviceName());
@@ -88,6 +83,7 @@ class FirebaseTokenRepository implements FirebaseTokenRepositoryInterface
             $tokenModel->setDeviceName($token->getDeviceName());
             $this->saveToken($tokenModel);
         } catch (NoSuchEntityException $e) {
+            $token->setCustomerId($customerId);
             $this->saveToken($token);
         }
 
@@ -134,5 +130,22 @@ class FirebaseTokenRepository implements FirebaseTokenRepositoryInterface
                 $e
             );
         }
+    }
+
+    public function delete($customerId, $deviceName){
+        $token = $this->getByCustomerIdAndDeviceName($customerId, $deviceName);
+        $id = $token->getId();
+        try {
+            $this->resourceModel->delete($token);
+        } catch (ValidatorException $e) {
+            throw new CouldNotSaveException(__($e->getMessage()), $e);
+        } catch (\Exception $e) {
+            throw new StateException(
+                __('The token product couldn\'t be removed.'),
+                $e
+            );
+        }
+
+        return $id;
     }
 }
