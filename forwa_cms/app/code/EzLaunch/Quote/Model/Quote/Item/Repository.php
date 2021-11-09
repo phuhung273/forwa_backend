@@ -5,9 +5,9 @@
 
 namespace EzLaunch\Quote\Model\Quote\Item;
 
+use EzLaunch\Core\Helper\ProductHelper;
 use EzLaunch\FirebaseCloudMessaging\Api\FcmServiceInterface;
 use EzLaunch\Quote\Api\CartItemRepositoryInterface;
-use EzLaunch\Quote\Model\ResourceModel\Quote\Item\CollectionFactory as CartItemCollectionFactory;
 
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Checkout\Api\GuestPaymentInformationManagementInterface;
@@ -20,13 +20,12 @@ use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Api\Data\CartItemInterfaceFactory;
 use Magento\Quote\Model\Quote\Item\CartItemOptionsProcessor;
-use Magento\Quote\Model\Quote\Item\Repository as MagentoCartItemRepository;
 use Psr\Log\LoggerInterface;
 
 /**
  * Repository for quote item.
  */
-class Repository extends MagentoCartItemRepository implements CartItemRepositoryInterface
+class Repository extends \Magento\Quote\Model\Quote\Item\Repository implements CartItemRepositoryInterface
 {
 
     const DEFAULT_SHIPPING_METHOD = 'flatrate';
@@ -78,7 +77,7 @@ class Repository extends MagentoCartItemRepository implements CartItemRepository
     protected $addressRepository;
 
     /**
-     * @var CartItemCollectionFactory
+     * @var \EzLaunch\Quote\Model\ResourceModel\Quote\Item\CollectionFactory
      */
     protected $cartItemCollectionFactory;
 
@@ -96,6 +95,16 @@ class Repository extends MagentoCartItemRepository implements CartItemRepository
      * @var FcmServiceInterface
      */
     protected $fcmService;
+
+    /**
+     * @var \EzLaunch\FirebaseCloudMessaging\Model\ResourceModel\FirebaseToken\CollectionFactory
+     */
+    private $firebaseTokenCollectionFactory;
+
+    /**
+     * @var ProductHelper
+     */
+    private $productHelper;
 
     /**
      * @var array
@@ -116,10 +125,12 @@ class Repository extends MagentoCartItemRepository implements CartItemRepository
      * @param PaymentInformationManagementInterface $paymentInformationManagement
      * @param \EzLaunch\Core\Helper\CustomerHelper $customerHelper
      * @param AddressRepositoryInterface $addressRepository
-     * @param CartItemCollectionFactory $cartItemCollectionFactory
+     * @param \EzLaunch\Quote\Model\ResourceModel\Quote\Item\CollectionFactory $cartItemCollectionFactory
      * @param \EzLaunch\Quote\Model\CartItemSearchResultsFactory $cartItemSearchResultsFactory
      * @param LoggerInterface $logger
      * @param FcmServiceInterface $fcmService
+     * @param \EzLaunch\FirebaseCloudMessaging\Model\ResourceModel\FirebaseToken\CollectionFactory $firebaseTokenCollectionFactory
+     * @param ProductHelper $productHelper
      * @param CartItemProcessorInterface[] $cartItemProcessors
      */
     public function __construct(
@@ -135,10 +146,12 @@ class Repository extends MagentoCartItemRepository implements CartItemRepository
         PaymentInformationManagementInterface $paymentInformationManagement,
         \EzLaunch\Core\Helper\CustomerHelper $customerHelper,
         AddressRepositoryInterface $addressRepository,
-        CartItemCollectionFactory $cartItemCollectionFactory,
+        \EzLaunch\Quote\Model\ResourceModel\Quote\Item\CollectionFactory $cartItemCollectionFactory,
         \EzLaunch\Quote\Model\CartItemSearchResultsFactory $cartItemSearchResultsFactory,
         LoggerInterface $logger,
         FcmServiceInterface $fcmService,
+        \EzLaunch\FirebaseCloudMessaging\Model\ResourceModel\FirebaseToken\CollectionFactory $firebaseTokenCollectionFactory,
+        ProductHelper $productHelper,
         array $cartItemProcessors = []
     ) {
         parent::__construct(
@@ -161,6 +174,8 @@ class Repository extends MagentoCartItemRepository implements CartItemRepository
         $this->cartItemSearchResultsFactory = $cartItemSearchResultsFactory;
         $this->logger = $logger;
         $this->fcmService = $fcmService;
+        $this->firebaseTokenCollectionFactory = $firebaseTokenCollectionFactory;
+        $this->productHelper = $productHelper;
     }
     
     /**
@@ -181,7 +196,8 @@ class Repository extends MagentoCartItemRepository implements CartItemRepository
         $quote->setCustomerNote($message);
         $this->quoteRepository->save($quote);
         $quote->collectTotals();
-
+        $cartItem = $quote->getLastAddedItem();
+        
         $shippingInfo = $this->shippingInformationFactory->create();
 
         $defaultQuoteBilling = $this->customerHelper->getDefaultQuoteBilling($customer);
@@ -200,11 +216,8 @@ class Repository extends MagentoCartItemRepository implements CartItemRepository
             $defaultQuoteBilling,
         );
 
-        $this->fcmService->send(
-            'cjg-L2XXSee9jGwWYqK-ii:APA91bFK0592Fn87VqEZ8kQ27LJoIDSDO2J87hVCPAmcMpH5qBvyDHnEAsxu54-RglDOesfjCueYV4s6t2YC01uSflGLNi99vK-PzoCNEHpl5S1fCpL_EddvVTtGMIy_c8GDM4EFM4u1',
-            'Forwa',
-            'Hello world nhaaaaa'
-        );
+        $seller = $this->productHelper->getSellerOfProductSku($cartItem->getSku());
+        $this->sendNotiToSeller($seller, $customer, $cartItem);
 
         return $orderId;
     }
@@ -248,6 +261,7 @@ class Repository extends MagentoCartItemRepository implements CartItemRepository
      * Creates an empty cart and quote for a specified customer if customer does not have a cart yet.
      *
      * @param int $customerId The customer ID.
+     * @param int $storeId The store ID.
      * @return int new cart ID if customer did not have a cart or ID of the existing cart otherwise.
      * @throws \Magento\Framework\Exception\CouldNotSaveException The empty cart and quote could not be created.
      */
@@ -263,6 +277,31 @@ class Repository extends MagentoCartItemRepository implements CartItemRepository
             throw new CouldNotSaveException(__("The quote can't be created."));
         }
         return (int)$quote->getId();
+    }
+
+    /**
+     * Send noti to all devices of seller
+     *
+     * @param \Magento\Customer\Api\Data\CustomerInterface $seller The seller.
+     * @param \Magento\Customer\Api\Data\CustomerInterface $customer The customer.
+     * @param \Magento\Quote\Api\Data\CartItemInterface $cartItem The cart item.
+     */
+    private function sendNotiToSeller($seller, $customer, $cartItem)
+    {
+        $collection = $this->firebaseTokenCollectionFactory->create();
+        $collection->addCustomerInfo($seller->getId());
+
+        $productName = $cartItem->getName();
+        $customerName = $customer->getFirstname() . ' ' . $customer->getLastname();
+        $message = "{$customerName} đang xin bạn {$productName}, vào Forwa xem thử họ ra sao nhé!";
+        
+        foreach ($collection as $item) {
+            $this->fcmService->send(
+                $item->getValue(),
+                null,
+                $message
+            );
+        }
     }
 
     /**

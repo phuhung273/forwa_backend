@@ -54,7 +54,7 @@ class FcmService implements FcmServiceInterface
     /**
      * @inheritdoc
      */
-    public function send(string $token, string $title, string $body){
+    public function send($token, $title = null, $body){
         $message = CloudMessage::withTarget('token', $token)
             ->withNotification(Notification::create($title, $body));
         

@@ -16,7 +16,7 @@
     </route>
 
     <route url="/V2/order/:orderId/invoice" method="POST">
-        <service class="Magento\Sales\Api\InvoiceOrderInterface" method="execute"/>
+        <service class="EzLaunch\Sales\Api\InvoiceOrderInterface" method="createInvoice"/>
     </route>
 
     <route url="/V2/order/:orderId/ship" method="POST">
